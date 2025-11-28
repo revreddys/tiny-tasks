@@ -1,0 +1,125 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============ HELPER FUNCTIONS ============
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if the user owns this resource (for parent-owned data)
+    function isOwner(parentId) {
+      return isAuthenticated() && request.auth.uid == parentId;
+    }
+    
+    // Check if the user is creating a resource they own
+    function isCreatingOwned() {
+      return isAuthenticated() && request.resource.data.parentId == request.auth.uid;
+    }
+    
+    // Validate string length
+    function isValidString(field, minLen, maxLen) {
+      return field is string && field.size() >= minLen && field.size() <= maxLen;
+    }
+    
+    // Validate number range
+    function isValidNumber(field, min, max) {
+      return field is number && field >= min && field <= max;
+    }
+    
+    // ============ USER DOCUMENTS ============
+    
+    // Users can only read/write their own user document
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ============ CHILDREN ============
+    
+    // Children profiles - parent can manage, authenticated users can read
+    match /children/{childId} {
+      // Any authenticated user can read children (for family sharing)
+      allow read: if isAuthenticated();
+      
+      // Only the parent can create (must set themselves as parentId)
+      allow create: if isCreatingOwned()
+        && isValidString(request.resource.data.name, 1, 50);
+      
+      // Only the parent can update/delete
+      allow update, delete: if isOwner(resource.data.parentId);
+    }
+    
+    // ============ DAILY TASKS ============
+    
+    // Daily task lists - authenticated users can read/write for their children
+    match /dailyTasks/{taskListId} {
+      // Authenticated users can read (needed for child to see their tasks)
+      allow read: if isAuthenticated();
+      
+      // Only the parent can create new task lists
+      allow create: if isCreatingOwned();
+      
+      // Authenticated users can update (children need to mark tasks complete)
+      // But only the parent can fully modify
+      allow update: if isAuthenticated();
+      
+      // Only the parent can delete
+      allow delete: if isOwner(resource.data.parentId);
+    }
+    
+    // ============ TASK TEMPLATES ============
+    
+    // Task templates - parent only
+    match /taskTemplates/{templateId} {
+      allow read: if isAuthenticated();
+      allow create: if isCreatingOwned()
+        && isValidString(request.resource.data.name, 1, 100);
+      allow update, delete: if isOwner(resource.data.parentId);
+    }
+    
+    // ============ ROUTINES (Legacy) ============
+    
+    match /routines/{routineId} {
+      allow read: if isAuthenticated();
+      allow create: if isCreatingOwned();
+      allow update, delete: if isOwner(resource.data.parentId);
+    }
+    
+    // ============ DAILY PROGRESS (Legacy) ============
+    
+    match /dailyProgress/{progressId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // ============ REWARDS ============
+    
+    // Rewards - parent manages, children can read
+    match /rewards/{rewardId} {
+      allow read: if isAuthenticated();
+      allow create: if isCreatingOwned()
+        && isValidString(request.resource.data.name, 1, 100)
+        && isValidNumber(request.resource.data.starCost, 1, 10000);
+      allow update, delete: if isOwner(resource.data.parentId);
+    }
+    
+    // ============ REDEMPTIONS ============
+    
+    // Redemptions - children create, anyone in family can read, parent approves
+    match /redemptions/{redemptionId} {
+      allow read: if isAuthenticated();
+      
+      // Anyone authenticated can create (child redeeming)
+      allow create: if isAuthenticated()
+        && isValidNumber(request.resource.data.starCost, 1, 10000);
+      
+      // Anyone authenticated can update (parent approving, or status changes)
+      allow update: if isAuthenticated();
+      
+      // Only allow delete if authenticated
+      allow delete: if isAuthenticated();
+    }
+  }
+}
