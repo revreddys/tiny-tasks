@@ -31,8 +31,17 @@ interface CelebrationModalProps {
   onClose: () => void;
 }
 
-// Particle shapes and colors for confetti
-const PARTICLE_COLORS = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+// Particle shapes and colors for confetti - harmonized with teal/navy theme
+const PARTICLE_COLORS = [
+  '#FFD700', // Gold - for stars
+  '#F59E0B', // Amber - matches CTA buttons
+  '#0D9488', // Teal - matches primary gradient
+  '#14B8A6', // Lighter teal
+  '#06B6D4', // Cyan
+  '#38BDF8', // Sky blue
+  '#A7F3D0', // Mint green
+  '#FCD34D', // Light gold
+];
 const PARTICLE_SHAPES = ['circle', 'square', 'star'] as const;
 
 // Single confetti particle with realistic physics
@@ -274,13 +283,14 @@ export default function CelebrationModal({ celebration, onClose }: CelebrationMo
   };
   
   const getGlowColor = () => {
+    // Colors harmonized with teal/navy theme
     switch (celebration.type) {
-      case 'task': return '#FFD700';
-      case 'routine': return '#4ECDC4';
-      case 'badge': return '#9B59B6';
-      case 'streak': return '#FF6B6B';
-      case 'redemption': return '#E056FD';
-      default: return '#FFD700';
+      case 'task': return '#F59E0B';      // Amber - matches app accent
+      case 'routine': return '#14B8A6';   // Teal - matches primary
+      case 'badge': return '#8B5CF6';     // Purple - still distinct but softer
+      case 'streak': return '#F97316';    // Orange - warm but not jarring
+      case 'redemption': return '#06B6D4'; // Cyan - complements teal
+      default: return '#F59E0B';
     }
   };
   
@@ -342,7 +352,7 @@ export default function CelebrationModal({ celebration, onClose }: CelebrationMo
               
               {/* Badge display */}
               {celebration.type === 'badge' && celebration.badge && (
-                <View style={[styles.badgeDisplay, { backgroundColor: '#9B59B6' + '20' }]}>
+                <View style={[styles.badgeDisplay, { backgroundColor: '#8B5CF6' + '20' }]}>
                   <Text style={styles.badgeName}>{celebration.badge.name}</Text>
                 </View>
               )}
@@ -357,7 +367,7 @@ export default function CelebrationModal({ celebration, onClose }: CelebrationMo
               
               {/* Reward display */}
               {celebration.type === 'redemption' && celebration.reward && (
-                <View style={[styles.rewardDisplay, { backgroundColor: '#E056FD' + '20' }]}>
+                <View style={[styles.rewardDisplay, { backgroundColor: '#06B6D4' + '20' }]}>
                   <Text style={styles.rewardName}>{celebration.reward.name}</Text>
                 </View>
               )}
@@ -481,7 +491,7 @@ const styles = StyleSheet.create({
   badgeName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#9B59B6',
+    color: '#8B5CF6',
   },
   streakDisplay: {
     alignItems: 'center',
@@ -489,7 +499,7 @@ const styles = StyleSheet.create({
   streakNumber: {
     fontSize: 48,
     fontWeight: '800',
-    color: '#FF6B6B',
+    color: '#F97316',
   },
   streakLabel: {
     fontSize: 16,
@@ -503,7 +513,7 @@ const styles = StyleSheet.create({
   rewardName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#E056FD',
+    color: '#06B6D4',
     textAlign: 'center',
   },
   continueButton: {
