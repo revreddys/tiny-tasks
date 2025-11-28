@@ -16,11 +16,12 @@ import Animated, {
   FadeInDown,
   useSharedValue,
   useAnimatedStyle,
-  withRepeat,
   withSequence,
   withTiming,
   withSpring,
+  withDelay,
   Layout,
+  Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '../../lib/stores/authStore';
@@ -64,9 +65,11 @@ export default function ChildHomeScreen() {
   
   const [refreshing, setRefreshing] = useState(false);
   
-  // Animations
-  const avatarBounce = useSharedValue(0);
-  const streakPulse = useSharedValue(1);
+  // Animations - subtle entrance only, not continuous
+  const avatarScale = useSharedValue(0.8);
+  const avatarOpacity = useSharedValue(0);
+  const streakScale = useSharedValue(0.8);
+  const streakOpacity = useSharedValue(0);
   
   // Load tasks when child or date changes
   useEffect(() => {
@@ -95,34 +98,27 @@ export default function ChildHomeScreen() {
   };
   
   useEffect(() => {
-    // Start animations
-    avatarBounce.value = withRepeat(
-      withSequence(
-        withTiming(-10, { duration: 500 }),
-        withTiming(0, { duration: 500 })
-      ),
-      -1,
-      true
-    );
+    // Smooth entrance animations - only once
+    avatarScale.value = withSpring(1, { damping: 12, stiffness: 100 });
+    avatarOpacity.value = withTiming(1, { duration: 400 });
     
     if (selectedChild && selectedChild.currentStreak > 0) {
-      streakPulse.value = withRepeat(
-        withSequence(
-          withTiming(1.1, { duration: 800 }),
-          withTiming(1, { duration: 800 })
-        ),
-        -1,
-        true
-      );
+      streakScale.value = withDelay(200, withSpring(1, { damping: 10, stiffness: 120 }));
+      streakOpacity.value = withDelay(200, withTiming(1, { duration: 300 }));
+    } else {
+      streakScale.value = withSpring(1, { damping: 12 });
+      streakOpacity.value = withTiming(1, { duration: 300 });
     }
   }, [selectedChild]);
   
   const avatarStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: avatarBounce.value }],
+    transform: [{ scale: avatarScale.value }],
+    opacity: avatarOpacity.value,
   }));
   
   const streakStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: streakPulse.value }],
+    transform: [{ scale: streakScale.value }],
+    opacity: streakOpacity.value,
   }));
   
   if (!selectedChild) {
@@ -432,9 +428,23 @@ interface TaskCardProps {
 function TaskCard({ task, index, groupIndex, onPress, colors, categoryColor }: TaskCardProps) {
   const scale = useSharedValue(1);
   const checkScale = useSharedValue(task.completed ? 1 : 0);
+  const checkRotate = useSharedValue(task.completed ? 0 : -90);
+  const cardGlow = useSharedValue(task.completed ? 1 : 0);
   
   useEffect(() => {
-    checkScale.value = withSpring(task.completed ? 1 : 0, { damping: 12 });
+    if (task.completed) {
+      // Smooth check animation with slight overshoot
+      checkScale.value = withSpring(1, { damping: 10, stiffness: 200 });
+      checkRotate.value = withSpring(0, { damping: 12 });
+      cardGlow.value = withSequence(
+        withTiming(1, { duration: 200 }),
+        withTiming(0.6, { duration: 300 })
+      );
+    } else {
+      checkScale.value = withTiming(0, { duration: 150, easing: Easing.in(Easing.ease) });
+      checkRotate.value = withTiming(-90, { duration: 150 });
+      cardGlow.value = withTiming(0, { duration: 200 });
+    }
   }, [task.completed]);
   
   const cardStyle = useAnimatedStyle(() => ({
@@ -442,16 +452,19 @@ function TaskCard({ task, index, groupIndex, onPress, colors, categoryColor }: T
   }));
   
   const checkStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: checkScale.value }],
+    transform: [
+      { scale: checkScale.value },
+      { rotate: `${checkRotate.value}deg` },
+    ],
     opacity: checkScale.value,
   }));
   
   const handlePressIn = () => {
-    scale.value = withSpring(0.97);
+    scale.value = withTiming(0.98, { duration: 100, easing: Easing.out(Easing.ease) });
   };
   
   const handlePressOut = () => {
-    scale.value = withSpring(1);
+    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
   };
   
   return (

@@ -11,11 +11,8 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
   FadeInUp, 
-  FadeInDown,
   useSharedValue,
   useAnimatedStyle,
-  withRepeat,
-  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -142,30 +139,27 @@ export default function BadgesScreen() {
 
 // Earned Badge Card Component
 function EarnedBadgeCard({ badge, colors }: { badge: Badge; colors: any }) {
-  const shine = useSharedValue(0);
+  const scale = useSharedValue(0.9);
+  const opacity = useSharedValue(0);
   
   useEffect(() => {
-    shine.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 2000 }),
-        withTiming(0, { duration: 2000 })
-      ),
-      -1,
-      false
-    );
+    // One-time entrance animation
+    scale.value = withTiming(1, { duration: 400 });
+    opacity.value = withTiming(1, { duration: 300 });
   }, []);
   
-  const shineStyle = useAnimatedStyle(() => ({
-    opacity: 0.3 + shine.value * 0.3,
+  const cardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
   }));
   
   return (
-    <View style={[styles.earnedBadge, { borderColor: badge.color, backgroundColor: colors.cardBg }]}>
-      <Animated.View style={[styles.badgeShine, shineStyle]} />
+    <Animated.View style={[styles.earnedBadge, { borderColor: badge.color, backgroundColor: colors.cardBg }, cardStyle]}>
+      <View style={[styles.badgeGlow, { backgroundColor: badge.color + '15' }]} />
       <Text style={styles.badgeIcon}>{badge.icon}</Text>
       <Text style={[styles.badgeName, { color: colors.text }]}>{badge.name}</Text>
       <Text style={[styles.badgeDesc, { color: colors.textLight }]}>{badge.description}</Text>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -316,14 +310,13 @@ const styles = StyleSheet.create({
     elevation: 5,
     overflow: 'hidden',
   },
-  badgeShine: {
+  badgeGlow: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#FFD700',
-    borderRadius: 20,
+    borderRadius: 17,
   },
   badgeIcon: {
     fontSize: 40,
