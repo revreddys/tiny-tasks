@@ -8,6 +8,10 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
   User,
 } from 'firebase/auth';
 import {
@@ -97,6 +101,26 @@ export const signIn = async (email: string, password: string) => {
 
 export const signOut = async () => {
   await firebaseSignOut(auth);
+};
+
+// Send password reset email
+export const resetPassword = async (email: string) => {
+  await sendPasswordResetEmail(auth, email);
+};
+
+// Change password (requires current password for re-authentication)
+export const changePassword = async (currentPassword: string, newPassword: string) => {
+  const user = auth.currentUser;
+  if (!user || !user.email) {
+    throw new Error('No user logged in');
+  }
+  
+  // Re-authenticate user before changing password
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  await reauthenticateWithCredential(user, credential);
+  
+  // Update password
+  await updatePassword(user, newPassword);
 };
 
 export const onAuthChange = (callback: (user: User | null) => void) => {

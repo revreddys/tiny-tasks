@@ -6,6 +6,10 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  TextInput,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -16,6 +20,7 @@ import { usePasscodeStore } from '../../lib/stores/passcodeStore';
 import { useThemeStore } from '../../lib/stores/themeStore';
 import Colors from '../../constants/colors';
 import PinSetup from '../../components/PinSetup';
+import { changePassword } from '../../lib/firebase';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -37,6 +42,13 @@ export default function SettingsScreen() {
   const [showPinSetup, setShowPinSetup] = useState(false);
   const [isChangingPin, setIsChangingPin] = useState(false);
   const [editingChildId, setEditingChildId] = useState<string | null>(null);
+  
+  // Password change state
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   
   useEffect(() => {
     loadPasscodes();
@@ -130,6 +142,41 @@ export default function SettingsScreen() {
       return async (pin: string) => await verifyPasscode(editingChildId, pin);
     }
     return verifyParentPasscode;
+  };
+  
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      Alert.alert('Oops!', 'Please fill in all fields');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      Alert.alert('Oops!', 'New password must be at least 6 characters');
+      return;
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+      Alert.alert('Oops!', 'New passwords do not match');
+      return;
+    }
+    
+    setIsChangingPassword(true);
+    try {
+      await changePassword(currentPassword, newPassword);
+      setShowPasswordModal(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      Alert.alert('Success! 🔐', 'Your password has been changed.');
+    } catch (err: any) {
+      if (err.code === 'auth/wrong-password') {
+        Alert.alert('Error', 'Current password is incorrect');
+      } else {
+        Alert.alert('Error', err.message || 'Could not change password. Please try again.');
+      }
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
   
   const handleLogout = () => {
@@ -410,6 +457,15 @@ export default function SettingsScreen() {
               <Text style={[styles.accountValue, { color: colors.text }]}>{user?.email}</Text>
             </View>
             
+            <View style={styles.buttonRow}>
+              <Pressable 
+                style={[styles.actionButton, { backgroundColor: colors.background, borderColor: colors.border }]} 
+                onPress={() => setShowPasswordModal(true)}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>🔐 Change Password</Text>
+              </Pressable>
+            </View>
+            
             <Pressable 
               style={[styles.actionButton, styles.dangerButton, styles.fullWidth]} 
               onPress={handleLogout}
@@ -439,6 +495,75 @@ export default function SettingsScreen() {
         isChanging={isChangingPin}
         verifyCurrentPin={isChangingPin ? getCurrentVerifyFn() : undefined}
       />
+      
+      {/* Change Password Modal */}
+      <Modal
+        visible={showPasswordModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPasswordModal(false)}
+      >
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={[styles.passwordModal, { backgroundColor: colors.cardBg }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>🔐 Change Password</Text>
+              <Pressable onPress={() => {
+                setShowPasswordModal(false);
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmNewPassword('');
+              }}>
+                <Text style={[styles.modalClose, { color: colors.textLight }]}>✕</Text>
+              </Pressable>
+            </View>
+            
+            <View style={styles.passwordInputs}>
+              <Text style={[styles.inputLabel, { color: colors.text }]}>Current Password</Text>
+              <TextInput
+                style={[styles.passwordInput, { backgroundColor: colors.inputBg, color: colors.text }]}
+                placeholder="Enter current password"
+                placeholderTextColor={colors.textLight}
+                secureTextEntry
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+              />
+              
+              <Text style={[styles.inputLabel, { color: colors.text }]}>New Password</Text>
+              <TextInput
+                style={[styles.passwordInput, { backgroundColor: colors.inputBg, color: colors.text }]}
+                placeholder="At least 6 characters"
+                placeholderTextColor={colors.textLight}
+                secureTextEntry
+                value={newPassword}
+                onChangeText={setNewPassword}
+              />
+              
+              <Text style={[styles.inputLabel, { color: colors.text }]}>Confirm New Password</Text>
+              <TextInput
+                style={[styles.passwordInput, { backgroundColor: colors.inputBg, color: colors.text }]}
+                placeholder="Re-enter new password"
+                placeholderTextColor={colors.textLight}
+                secureTextEntry
+                value={confirmNewPassword}
+                onChangeText={setConfirmNewPassword}
+              />
+            </View>
+            
+            <Pressable
+              style={[styles.changePasswordButton, { backgroundColor: colors.primary }]}
+              onPress={handleChangePassword}
+              disabled={isChangingPassword}
+            >
+              <Text style={styles.changePasswordButtonText}>
+                {isChangingPassword ? 'Changing...' : 'Change Password'}
+              </Text>
+            </Pressable>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -688,6 +813,57 @@ const styles = StyleSheet.create({
   themeLabel: {
     fontSize: 13,
     fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  passwordModal: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 20,
+    padding: 25,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  modalClose: {
+    fontSize: 24,
+    padding: 5,
+  },
+  passwordInputs: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+    marginTop: 12,
+  },
+  passwordInput: {
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+  },
+  changePasswordButton: {
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  changePasswordButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
 
