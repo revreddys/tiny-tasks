@@ -24,7 +24,6 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.tinytasks.app",
-      "versionCode": 1,
       "permissions": [
         "INTERNET",
         "VIBRATE"
@@ -46,11 +45,12 @@
         }
       ]
     ],
+    "owner": "revreddys",
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "727f1e96-f0e2-4c89-aace-2ea9611a01eb"
       }
-    },
-    "owner": "your-expo-username"
+    }
   }
 }

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Tiny Tasks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.7;
+            color: #2D3436;
+            background: linear-gradient(135deg, #FFF5F8 0%, #FFE8EE 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            color: #FF6B9D;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #636E72;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        h2 {
+            color: #FF6B9D;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h3 {
+            color: #2D3436;
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            color: #636E72;
+        }
+        
+        ul {
+            margin: 10px 0 15px 20px;
+            color: #636E72;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #E8F6FF 0%, #F0FFF4 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .highlight-box h3 {
+            color: #4ECDC4;
+            margin-top: 0;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .check {
+            color: #6DD5B7;
+            font-size: 1.2rem;
+        }
+        
+        .contact-box {
+            background: #FF6B9D;
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .contact-box h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .contact-box a {
+            color: white;
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #636E72;
+        }
+        
+        .updated {
+            background: #FFE66D;
+            color: #2D3436;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🦄</div>
+            <h1>Tiny Tasks</h1>
+            <p class="subtitle">Privacy Policy</p>
+            <span class="updated">Last Updated: November 28, 2024</span>
+        </header>
+        
+        <div class="card">
+            <h2>👋 Introduction</h2>
+            <p>Tiny Tasks ("we," "our," or "us") is committed to protecting the privacy of our users, especially children. This Privacy Policy explains how we collect, use, and safeguard information when you use our mobile application.</p>
+        </div>
+        
+        <div class="card">
+            <h2>📊 Information We Collect</h2>
+            
+            <h3>Account Information</h3>
+            <ul>
+                <li><strong>Email address</strong> - Used for parent account authentication</li>
+                <li><strong>Password</strong> - Securely stored using Firebase Authentication (encrypted, never stored in plain text)</li>
+            </ul>
+            
+            <h3>Child Profile Information</h3>
+            <ul>
+                <li><strong>Child's first name</strong> - Used to personalize the app experience</li>
+                <li><strong>Avatar selection</strong> - Visual customization choices</li>
+                <li><strong>Task completion data</strong> - Stars earned, streaks, badges achieved</li>
+            </ul>
+            
+            <h3>App Usage Data</h3>
+            <ul>
+                <li>Daily task completion records</li>
+                <li>Reward redemption history</li>
+                <li>App preferences (theme settings)</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>🎯 How We Use Information</h2>
+            <p>We use the collected information to:</p>
+            <ul>
+                <li>Authenticate parent accounts</li>
+                <li>Track children's task progress and achievements</li>
+                <li>Award stars, badges, and maintain streaks</li>
+                <li>Enable the rewards system</li>
+                <li>Improve app functionality</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>🔒 Data Storage and Security</h2>
+            <ul>
+                <li>All data is stored securely using <strong>Google Firebase</strong> (Firestore database)</li>
+                <li>Data is encrypted in transit using HTTPS/TLS</li>
+                <li>PIN codes for profile protection are <strong>hashed using SHA-256</strong> before storage</li>
+                <li>We implement Firebase Security Rules to protect data access</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>👶 Children's Privacy (COPPA Compliance)</h2>
+            <p>Tiny Tasks is designed for use by families with children. We take children's privacy seriously:</p>
+            
+            <div class="highlight-box">
+                <ul>
+                    <li><strong>We do not collect personal information directly from children</strong> - Parents create and manage child profiles</li>
+                    <li><strong>No advertising</strong> - We do not display ads to children</li>
+                    <li><strong>No third-party tracking</strong> - We do not share data with advertisers</li>
+                    <li><strong>Parental control</strong> - Parents have full control over child profiles and can delete them at any time</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🤝 Data Sharing</h2>
+            <p>We <strong>do not sell, trade, or share</strong> your personal information with third parties, except:</p>
+            <ul>
+                <li>With <strong>Google Firebase</strong> for data storage and authentication (see <a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Privacy Policy</a>)</li>
+                <li>If required by law or legal process</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>🗄️ Data Retention</h2>
+            <ul>
+                <li>Account data is retained while your account is active</li>
+                <li>You can delete your account and all associated data at any time by contacting us</li>
+                <li>Child profile data can be deleted by parents within the app</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>⚖️ Your Rights</h2>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Access your personal data</li>
+                <li>Correct inaccurate data</li>
+                <li>Delete your account and data</li>
+                <li>Export your data</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>📝 Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last Updated" date at the top of this page.</p>
+        </div>
+        
+        <div class="card">
+            <h2>✅ Summary for Parents</h2>
+            <div class="summary-item">
+                <span class="check">✅</span>
+                <span>We only collect what's needed to make the app work</span>
+            </div>
+            <div class="summary-item">
+                <span class="check">✅</span>
+                <span>Your child's data stays private and secure</span>
+            </div>
+            <div class="summary-item">
+                <span class="check">✅</span>
+                <span>No ads, no tracking, no data selling</span>
+            </div>
+            <div class="summary-item">
+                <span class="check">✅</span>
+                <span>You're in control - delete anytime</span>
+            </div>
+            <div class="summary-item">
+                <span class="check">✅</span>
+                <span>PIN codes are encrypted for protection</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="contact-box">
+                <h3>📧 Contact Us</h3>
+                <p>If you have questions about this Privacy Policy or our data practices, please contact us at:</p>
+                <a href="mailto:revreddys@gmail.com">revreddys@gmail.com</a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>🦄 Tiny Tasks - Making daily routines fun for kids!</p>
+            <p>© 2024 Tiny Tasks. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
+
